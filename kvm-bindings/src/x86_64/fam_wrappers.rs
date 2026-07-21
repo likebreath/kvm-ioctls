@@ -74,6 +74,12 @@ impl PartialEq for kvm_msrs {
 /// [FamStructWrapper](../vmm_sys_util/fam/struct.FamStructWrapper.html).
 pub type Msrs = FamStructWrapper<kvm_msrs>;
 
+/// Maximum number of IRQ routes KVM can accept (`KVM_MAX_IRQ_ROUTES`).
+///
+/// See `include/linux/kvm_host.h`. This is the ceiling the kernel enforces on
+/// `KVM_SET_GSI_ROUTING`.
+pub const KVM_MAX_IRQ_ROUTES: usize = 4096;
+
 // Implement the FamStruct trait for kvm_irq_routing
 generate_fam_struct_impl!(
     kvm_irq_routing,
@@ -81,7 +87,7 @@ generate_fam_struct_impl!(
     entries,
     u32,
     nr,
-    1024
+    KVM_MAX_IRQ_ROUTES
 );
 
 // Implement the PartialEq trait for kvm_irq_routing.
@@ -266,5 +272,13 @@ mod tests {
         assert_eq!(wrapper.as_slice().len(), 1);
         assert_eq!(wrapper.as_fam_struct_ref().len(), 1);
         assert_eq!(wrapper.as_fam_struct_ref().nr, 1);
+
+        // The wrapper must accept up to KVM_MAX_IRQ_ROUTES entries (the kernel's
+        // KVM_MAX_IRQ_ROUTES) and reject anything larger. Large VMs with many
+        // passthrough devices legitimately need well over 1024 GSI routes.
+        assert_eq!(kvm_irq_routing::max_len(), KVM_MAX_IRQ_ROUTES);
+        let wrapper = KvmIrqRouting::new(KVM_MAX_IRQ_ROUTES).unwrap();
+        assert_eq!(wrapper.as_slice().len(), KVM_MAX_IRQ_ROUTES);
+        KvmIrqRouting::new(KVM_MAX_IRQ_ROUTES + 1).unwrap_err();
     }
 }

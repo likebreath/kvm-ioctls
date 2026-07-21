@@ -2,6 +2,12 @@
 
 ## Upcoming Release
 
+### Changed
+
+- [[381]](https://github.com/rust-vmm/kvm/pull/381)
+  Raised kvm_irq_routing cap to KVM_MAX_IRQ_ROUTES (4096) matching the
+  kernel
+
 ## v0.14.1
 
 ### Fixed
@@ -21,8 +27,8 @@
 
 ### Added
 
-- [[#322]](https://github.com/rust-vmm/kvm/pull/322)  
-  Foundations for `kvm-ioctls`'s GET_NESTED_STATE and SET_NESTED_STATE 
+- [[#322]](https://github.com/rust-vmm/kvm/pull/322)
+  Foundations for `kvm-ioctls`'s GET_NESTED_STATE and SET_NESTED_STATE
 
 ### Changed
 

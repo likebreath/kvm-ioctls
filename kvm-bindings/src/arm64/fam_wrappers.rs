@@ -30,6 +30,12 @@ impl PartialEq for kvm_reg_list {
 /// [FamStructWrapper](../vmm_sys_util/fam/struct.FamStructWrapper.html).
 pub type RegList = FamStructWrapper<kvm_reg_list>;
 
+/// Maximum number of IRQ routes KVM can accept (`KVM_MAX_IRQ_ROUTES`).
+///
+/// See `include/linux/kvm_host.h`. This is the ceiling the kernel enforces on
+/// `KVM_SET_GSI_ROUTING.
+pub const KVM_MAX_IRQ_ROUTES: usize = 4096;
+
 // Implement the FamStruct trait for kvm_irq_routing
 generate_fam_struct_impl!(
     kvm_irq_routing,
@@ -37,7 +43,7 @@ generate_fam_struct_impl!(
     entries,
     u32,
     nr,
-    1024
+    KVM_MAX_IRQ_ROUTES
 );
 
 // Implement the PartialEq trait for kvm_irq_routing.
